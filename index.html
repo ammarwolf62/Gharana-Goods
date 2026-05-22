@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gharana Goods — Premium Fashion & More</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+  header { background: #1a1a2e; color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 2.5em; }
+  header p { color: #aaa; margin-top: 5px; }
+  .hero { background: linear-gradient(135deg, #16213e, #0f3460); color: white; padding: 60px 20px; text-align: center; }
+  .hero h2 { font-size: 2em; margin-bottom: 15px; }
+  .hero p { font-size: 1.1em; color: #ccc; max-width: 600px; margin: 0 auto; }
+  .categories { padding: 40px 20px; text-align: center; }
+  .categories h3 { font-size: 1.5em; margin-bottom: 25px; }
+  .cat-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 800px; margin: 0 auto; }
+  .cat-btn { padding: 15px 25px; border: 2px solid #0f3460; border-radius: 10px; background: white; color: #0f3460; font-size: 1em; cursor: pointer; transition: all 0.3s; }
+  .cat-btn:hover, .cat-btn.selected { background: #0f3460; color: white; }
+  .signup-form { background: white; padding: 40px 20px; max-width: 500px; margin: 0 auto 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+  .signup-form h3 { text-align: center; margin-bottom: 20px; font-size: 1.4em; }
+  .signup-form input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 1em; }
+  .signup-form button { width: 100%; padding: 15px; background: #e94560; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; margin-top: 10px; }
+  .signup-form button:hover { background: #c73652; }
+  #message { text-align: center; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+  .success { background: #d4edda; color: #155724; }
+  .error { background: #f8d7da; color: #721c24; }
+  footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛍️ Gharana Goods</h1>
+  <p>Premium Quality — Delivered to Your Door</p>
+</header>
+
+<div class="hero">
+  <h2>Discover Products You'll Love</h2>
+  <p>Sign up and get personalized deals based on your interests. Never miss a sale again!</p>
+</div>
+
+<div class="categories">
+  <h3>What are you interested in?</h3>
+  <div class="cat-grid">
+    <button class="cat-btn" onclick="selectCategory(this, 'fashion')">👗 Fashion</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'electronics')">📱 Electronics</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'home_decor')">🏠 Home Decor</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'beauty')">💄 Beauty</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'sports')">⚽ Sports</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'books')">📚 Books</button>
+  </div>
+</div>
+
+<div class="signup-form">
+  <h3>Get Exclusive Deals 🎁</h3>
+  <input type="text" id="name" placeholder="Your Full Name" required>
+  <input type="email" id="email" placeholder="Your Email Address" required>
+  <input type="hidden" id="category" value="">
+  <button onclick="submitForm()">Subscribe for Free →</button>
+  <div id="message"></div>
+</div>
+
+<footer>
+  <p>© 2026 Gharana Goods. All rights reserved.</p>
+</footer>
+
+<script>
+function selectCategory(btn, category) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('category').value = category;
+}
+
+async function submitForm() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const category = document.getElementById('category').value;
+  const msg = document.getElementById('message');
+
+  if (!name || !email || !category) {
+    msg.style.display = 'block';
+    msg.className = 'error';
+    msg.textContent = '⚠️ Please fill in all fields and select a category!';
+    return;
+  }
+
+  try {
+    await fetch('http://localhost:5678/webhook/customer-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors',
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        category: category,
+        cart_value: '$0.00',
+        event_type: 'new_signup'
+      })
+    });
+
+    msg.style.display = 'block';
+    msg.className = 'success';
+    msg.textContent = '✅ You are subscribed! Check your email for confirmation.';
+    document.getElementById('name').value = '';
+    document.getElementById('email').value = '';
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+
+  } catch (error) {
+    msg.style.display = 'block';
+    msg.className = 'success';
+    msg.textContent = '✅ You are subscribed! Check your email for confirmation.';
+  }
+}
+</script>
+
+</body>
+</html>
